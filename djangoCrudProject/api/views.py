@@ -20,3 +20,24 @@ def create_user(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     ...
+    
+@api_view(['GET','PUT','DELETE'])
+def user_details(request, pk):
+    try:
+        user = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == "GET":
+        serialized = UserSerializer(user)
+        return Response(serialized.data)
+    elif request.method == "PUT":
+        serialized = UserSerializer(user, data=request.data)
+        serialized.is_valid()
+        serialized.save()
+        return Response(serialized.data)
+    elif request.method == "DELETE":
+        user.delete()
+        redirect()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
